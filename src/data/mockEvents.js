@@ -1,0 +1,18 @@
+export const MOCK_EVENTS = [
+  { id: 1,  title: 'Madison Jazz Ensemble',        category: 'Music',    venue: 'Overture Center',        date: '2026-03-29', time: '7:00 PM',  price: '$15–35' },
+  { id: 2,  title: 'Art on the Square',             category: 'Art',      venue: 'Capitol Square',         date: '2026-03-30', time: '10:00 AM', price: 'Free'   },
+  { id: 3,  title: 'Trivia Night at The Kafe',      category: 'Trivia',   venue: 'The Old Fashioned',      date: '2026-03-28', time: '8:00 PM',  price: 'Free'   },
+  { id: 4,  title: 'Dane County Farmers Market',    category: 'Festival', venue: 'Capitol Square',         date: '2026-03-29', time: '6:00 AM',  price: 'Free'   },
+  { id: 5,  title: 'Comedy Night: Open Mic',        category: 'Comedy',   venue: 'Comedy Club on State',   date: '2026-03-29', time: '9:00 PM',  price: '$10'    },
+  { id: 6,  title: 'Madison Roller Derby Bout',     category: 'Sports',   venue: 'Alliant Energy Center',  date: '2026-04-01', time: '6:00 PM',  price: '$12'    },
+  { id: 7,  title: 'Lakeside Social Hike',          category: 'Social',   venue: 'Picnic Point',           date: '2026-03-30', time: '9:00 AM',  price: 'Free'   },
+  { id: 8,  title: 'Wisconsin Chamber Orchestra',   category: 'Music',    venue: 'Capitol Theater',        date: '2026-04-03', time: '7:30 PM',  price: '$20–55' },
+  { id: 9,  title: 'Life Drawing Workshop',         category: 'Art',      venue: 'Sequoya Library',        date: '2026-04-02', time: '6:00 PM',  price: '$8'     },
+  { id: 10, title: 'Geeks Who Drink Trivia',        category: 'Trivia',   venue: 'Great Dane Pub',         date: '2026-04-01', time: '7:00 PM',  price: 'Free'   },
+  { id: 11, title: 'Madison Craft Beer Festival',   category: 'Festival', venue: 'Monona Terrace',         date: '2026-04-05', time: '1:00 PM',  price: '$25'    },
+  { id: 12, title: 'Stand-Up Showcase',             category: 'Comedy',   venue: 'Comedy Club on State',   date: '2026-04-04', time: '8:00 PM',  price: '$15'    },
+  { id: 13, title: 'Breakers vs. Mustangs Soccer',  category: 'Sports',   venue: 'Breese Stevens Field',   date: '2026-04-04', time: '7:00 PM',  price: '$10'    },
+  { id: 14, title: 'LGBTQ+ Board Game Night',       category: 'Social',   venue: 'QBar Madison',           date: '2026-04-03', time: '7:00 PM',  price: 'Free'   },
+  { id: 15, title: 'Thunderstruck Tribute Band',    category: 'Music',    venue: 'Majestic Theatre',       date: '2026-04-06', time: '8:00 PM',  price: '$18'    },
+  { id: 16, title: 'Photography Walk: Capitol',     category: 'Art',      venue: 'State Street',           date: '2026-04-05', time: '10:00 AM', price: 'Free'   },
+];

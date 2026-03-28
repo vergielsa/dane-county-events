@@ -1,0 +1,389 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #f5f2eb;
+  color: #1a1814;
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+.main {
+  padding: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.results-bar {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+}
+.results-bar strong { color: #1a1814; }
+
+.footer-note {
+  text-align: center;
+  font-size: 12px;
+  color: #bbb;
+  padding: 2rem 1rem;
+  letter-spacing: 0.03em;
+  margin-top: auto;
+}
+
+/* ── Header ── */
+.app-header {
+  background: #1a1814;
+  color: #f5f2eb;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+.app-logo span { color: #c8a96e; }
+.header-meta { font-size: 12px; color: #888; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* ── Donate Banner ── */
+.donate-banner {
+  background: #2a4a3e;
+  color: #f5f2eb;
+  padding: 0.65rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 13px;
+}
+.donate-banner p { opacity: 0.85; }
+.donate-banner strong { color: #a8d5be; }
+.donate-btn {
+  background: #c8a96e;
+  color: #1a1814;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+.donate-btn:hover { background: #d4b87a; }
+
+/* ── Filter Bar ── */
+.controls {
+  background: #fff;
+  border-bottom: 1px solid #e8e3d8;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-wrap input {
+  width: 100%;
+  border: 1px solid #ddd8cc;
+  border-radius: 8px;
+  padding: 8px 12px 8px 34px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: #faf9f6;
+  color: #1a1814;
+  outline: none;
+}
+.search-wrap input:focus { border-color: #c8a96e; }
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 14px;
+  pointer-events: none;
+}
+.sort-select {
+  border: 1px solid #ddd8cc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: #faf9f6;
+  color: #1a1814;
+  outline: none;
+  cursor: pointer;
+}
+.sort-select:focus { border-color: #c8a96e; }
+
+/* ── Category Pills ── */
+.cats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e8e3d8;
+}
+.cat-btn {
+  border: 1px solid #ddd8cc;
+  background: #faf9f6;
+  color: #555;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.cat-btn:hover { border-color: #c8a96e; color: #1a1814; }
+.cat-btn.active { background: #1a1814; color: #f5f2eb; border-color: #1a1814; }
+
+/* ── Event Grid ── */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* ── Event Card ── */
+.event-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e3d8;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 24, 20, 0.1);
+}
+.event-card-accent { height: 5px; }
+.event-card-body { padding: 1rem 1.1rem 1.1rem; }
+.event-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+.event-cat-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+.event-price { font-size: 12px; color: #888; }
+.event-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+  color: #1a1814;
+}
+.event-venue { font-size: 13px; color: #888; margin-bottom: 0.65rem; }
+.event-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 12px;
+  color: #666;
+  border-top: 1px solid #f0ede6;
+  padding-top: 0.65rem;
+}
+.event-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* ── Category Colors ── */
+.cat-music  { background: #fef3e2; color: #a06b00; }
+.acc-music  { background: #f59e0b; }
+.cat-art    { background: #eef2ff; color: #4338ca; }
+.acc-art    { background: #6366f1; }
+.cat-social { background: #f0fdf4; color: #166534; }
+.acc-social { background: #22c55e; }
+.cat-trivia { background: #fdf4ff; color: #7e22ce; }
+.acc-trivia { background: #a855f7; }
+.cat-festival { background: #fff1f2; color: #be123c; }
+.acc-festival { background: #f43f5e; }
+.cat-comedy { background: #fff7ed; color: #c2410c; }
+.acc-comedy { background: #f97316; }
+.cat-sports { background: #ecfeff; color: #155e75; }
+.acc-sports { background: #06b6d4; }
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #aaa;
+  grid-column: 1 / -1;
+}
+.empty-state p { font-size: 15px; margin-top: 0.5rem; }
+
+/* ── Status messages ── */
+.status-msg { font-size: 14px; color: #888; padding: 2rem 0; }
+.status-msg.error { color: #c0392b; }
+.retry-btn {
+  background: none;
+  border: 1px solid #c0392b;
+  color: #c0392b;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  margin-left: 8px;
+}
+.retry-btn:hover { background: #fdf0f0; }
+
+/* ── Donate Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,24,20,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #999;
+  line-height: 1;
+}
+.modal-close:hover { color: #1a1814; }
+.modal-header { margin-bottom: 1.5rem; }
+.modal-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+  color: #1a1814;
+}
+.modal-header p { font-size: 14px; color: #888; line-height: 1.5; }
+
+.donate-presets { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; }
+.preset-btn {
+  border: 1.5px solid #ddd8cc;
+  background: #faf9f6;
+  color: #1a1814;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.preset-btn:hover { border-color: #c8a96e; }
+.preset-btn.active { background: #1a1814; color: #f5f2eb; border-color: #1a1814; }
+.custom-amount-input {
+  flex: 1;
+  border: 1.5px solid #ddd8cc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  color: #1a1814;
+  background: #faf9f6;
+  outline: none;
+}
+.custom-amount-input:focus { border-color: #c8a96e; }
+
+.donate-submit-btn {
+  width: 100%;
+  background: #1a1814;
+  color: #f5f2eb;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+.donate-submit-btn:hover:not(:disabled) { background: #2d2a25; }
+.donate-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.donate-cancel-btn {
+  flex: 1;
+  background: none;
+  border: 1px solid #ddd8cc;
+  color: #888;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.donate-cancel-btn:hover { border-color: #999; color: #1a1814; }
+
+.donate-amount-display {
+  background: #f5f2eb;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 1rem;
+}
+.donate-amount-display strong { color: #1a1814; }
+
+.card-element-wrap {
+  border: 1.5px solid #ddd8cc;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 1rem;
+  background: #faf9f6;
+}
+
+.donate-form-actions { display: flex; gap: 8px; margin-bottom: 1rem; }
+.donate-form-actions .donate-submit-btn { flex: 2; }
+
+.donate-error { color: #c0392b; font-size: 13px; margin-bottom: 0.75rem; }
+
+.donate-secure-note { font-size: 12px; color: #aaa; text-align: center; }
+
+.donate-thanks { text-align: center; padding: 1rem 0; }
+.thanks-icon { font-size: 2.5rem; color: #c8a96e; margin-bottom: 1rem; }
+.donate-thanks h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  margin-bottom: 0.75rem;
+}
+.donate-thanks p { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 1.5rem; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .app-header { padding: 1rem; }
+  .controls { padding: 0.75rem 1rem; }
+  .cats { padding: 0.6rem 1rem; }
+  .main { padding: 1rem; }
+}
