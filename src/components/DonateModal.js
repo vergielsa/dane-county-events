@@ -33,21 +33,38 @@ function DonateForm({ amount, onSuccess, onCancel }) {
     setLoading(true);
     setErrorMsg('');
 
-    // In production you'd create a PaymentIntent on your backend.
-    // For now we confirm with test card data to show the full flow.
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: elements.getElement(CardElement),
-    });
+    try {
+      // Step 1: Create PaymentIntent on backend
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+      const intentRes = await fetch(`${backendUrl}/api/donate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      });
+      const intentData = await intentRes.json();
+      if (!intentRes.ok || !intentData.clientSecret) {
+        throw new Error(intentData.error || 'Failed to create payment');
+      }
 
-    if (error) {
-      setErrorMsg(error.message);
+      // Step 2: Confirm payment with card details
+      const { error, paymentIntent } = await stripe.confirmCardPayment(intentData.clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+        },
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+        setLoading(false);
+      } else if (paymentIntent.status === 'succeeded') {
+        onSuccess();
+      } else {
+        setErrorMsg('Payment did not complete. Please try again.');
+        setLoading(false);
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Something went wrong. Please try again.');
       setLoading(false);
-    } else {
-      // paymentMethod.id would be sent to your backend in production
-      console.log('PaymentMethod created:', paymentMethod.id);
-      setLoading(false);
-      onSuccess();
     }
   }
 
