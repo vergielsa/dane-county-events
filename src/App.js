@@ -1,108 +1,129 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import DonateBanner from './components/DonateBanner';
 import FilterBar from './components/FilterBar';
 import EventGrid from './components/EventGrid';
+import Pagination from './components/Pagination';
 import DonateModal from './components/DonateModal';
+import SubmitEventModal, { SubmitSuccessModal } from './components/SubmitEventModal';
+import VenueRequestModal, { VenueRequestSuccessModal } from './components/VenueRequestModal';
+import { fetchAllEvents, fetchLocalEvents } from './api/localApi';
 import './App.css';
 
-const CATEGORIES = ['All', 'Music', 'Art', 'Social', 'Trivia', 'Festival', 'Comedy', 'Sports'];
-
-const TM_KEY = process.env.REACT_APP_TICKETMASTER_KEY;
-
-function mapCategory(event) {
-  const seg = event.classifications?.[0]?.segment?.name || '';
-  const genre = event.classifications?.[0]?.genre?.name || '';
-  const combined = (seg + ' ' + genre).toLowerCase();
-
-  if (combined.includes('music')) return 'Music';
-  if (combined.includes('comedy')) return 'Comedy';
-  if (combined.includes('sport')) return 'Sports';
-  if (combined.includes('art') || combined.includes('theatre') || combined.includes('theater') || combined.includes('film')) return 'Art';
-  if (combined.includes('festival') || combined.includes('fair')) return 'Festival';
-  if (combined.includes('family') || combined.includes('community')) return 'Social';
-  return 'Music';
-}
-
-function parseEvents(tmEvents) {
-  return tmEvents.map(e => ({
-    id: e.id,
-    title: e.name,
-    category: mapCategory(e),
-    venue: e._embedded?.venues?.[0]?.name || 'Venue TBA',
-    date: e.dates?.start?.localDate || '',
-    time: e.dates?.start?.localTime
-      ? e.dates.start.localTime.slice(0, 5).replace(/^0/, '')
-      : 'TBA',
-    price: e.priceRanges
-      ? `$${Math.round(e.priceRanges[0].min)}–${Math.round(e.priceRanges[0].max)}`
-      : 'See site',
-    url: e.url,
-  }));
-}
+const CATEGORIES = ['All', 'Ticketmaster', 'Bars & Dives', 'Community'];
+const PAGE_SIZE = 50;
 
 function App() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [showBanner, setShowBanner] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [events, setEvents] = useState([]);
+  const [showDonateModal, setShowDonateModal] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showVenueRequestModal, setShowVenueRequestModal] = useState(false);
+  const [showVenueRequestSuccessModal, setShowVenueRequestSuccessModal] = useState(false);
+
+  const [displayedEvents, setDisplayedEvents] = useState([]);
+  const [displayTotal, setDisplayTotal] = useState(0);
+  const [displayTotalPages, setDisplayTotalPages] = useState(1);
+
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState([]);
+
+  const searchTimer = useRef(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 300);
+    return () => clearTimeout(searchTimer.current);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, sortBy]);
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
-    setError(null);
-    try {
-      const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
-      url.searchParams.set('apikey', TM_KEY);
-      url.searchParams.set('city', 'Madison');
-      url.searchParams.set('stateCode', 'WI');
-      url.searchParams.set('countryCode', 'US');
-      url.searchParams.set('size', '50');
-      url.searchParams.set('sort', 'date,asc');
+    setErrors([]);
 
-      const res = await fetch(url.toString());
-      if (!res.ok) throw new Error(`API error: ${res.status}`);
-      const data = await res.json();
-      const tmEvents = data._embedded?.events || [];
-      setEvents(parseEvents(tmEvents));
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    let result;
+
+    // All and Ticketmaster both use /api/events/all (which includes TM events)
+    if (activeCategory === 'All' || activeCategory === 'Ticketmaster') {
+      result = await fetchAllEvents({
+        page: currentPage,
+        limit: PAGE_SIZE,
+        search: debouncedSearch,
+        sort: sortBy,
+        category: activeCategory,
+      });
+    } else {
+      // Bars & Dives and Community use /api/events/submitted (local only)
+      result = await fetchLocalEvents({
+        page: currentPage,
+        limit: PAGE_SIZE,
+        category: activeCategory,
+        search: debouncedSearch,
+        sort: sortBy,
+      });
     }
-  }, []);
+
+    setDisplayedEvents(result.events);
+    setDisplayTotal(result.total);
+    setDisplayTotalPages(result.totalPages);
+    setLoading(false);
+  }, [currentPage, activeCategory, debouncedSearch, sortBy]);
 
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
 
-  const filteredEvents = useMemo(() => {
-    let results = events.filter(event => {
-      const matchesCat = activeCategory === 'All' || event.category === activeCategory;
-      const q = searchQuery.toLowerCase();
-      const matchesSearch =
-        !q ||
-        event.title.toLowerCase().includes(q) ||
-        event.venue.toLowerCase().includes(q) ||
-        event.category.toLowerCase().includes(q);
-      return matchesCat && matchesSearch;
-    });
+  function handleSubmitSuccess() {
+    setShowSubmitModal(false);
+    setShowSuccessModal(true);
+    fetchEvents();
+  }
 
-    if (sortBy === 'date') results.sort((a, b) => a.date.localeCompare(b.date));
-    else if (sortBy === 'name') results.sort((a, b) => a.title.localeCompare(b.title));
-    else if (sortBy === 'category') results.sort((a, b) => a.category.localeCompare(b.category));
-
-    return results;
-  }, [events, activeCategory, searchQuery, sortBy]);
+  function handlePageChange(newPage) {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   return (
     <div className="app">
-      <Header />
-      {showBanner && <DonateBanner onDismiss={() => setShowBanner(false)} onDonate={() => setShowModal(true)} />}
-      {showModal && <DonateModal onClose={() => setShowModal(false)} />}
+      <Header onSubmitClick={() => setShowSubmitModal(true)} onRequestVenue={() => setShowVenueRequestModal(true)} />
+      {showBanner && (
+        <DonateBanner
+          onDismiss={() => setShowBanner(false)}
+          onDonate={() => setShowDonateModal(true)}
+        />
+      )}
+      {showDonateModal && <DonateModal onClose={() => setShowDonateModal(false)} />}
+      {showSubmitModal && (
+        <SubmitEventModal
+          onClose={() => setShowSubmitModal(false)}
+          onSuccess={handleSubmitSuccess}
+        />
+      )}
+      {showSuccessModal && (
+        <SubmitSuccessModal onClose={() => setShowSuccessModal(false)} />
+      )}
+      {showVenueRequestModal && (
+        <VenueRequestModal
+          onClose={() => setShowVenueRequestModal(false)}
+          onSuccess={() => { setShowVenueRequestModal(false); setShowVenueRequestSuccessModal(true); }}
+        />
+      )}
+      {showVenueRequestSuccessModal && (
+        <VenueRequestSuccessModal onClose={() => setShowVenueRequestSuccessModal(false)} />
+      )}
       <FilterBar
         categories={CATEGORIES}
         activeCategory={activeCategory}
@@ -113,27 +134,33 @@ function App() {
         onSortChange={setSortBy}
       />
       <main className="main">
-        {loading && <p className="status-msg">Loading events from Ticketmaster...</p>}
-        {error && (
+        {loading && <p className="status-msg">Loading events...</p>}
+        {!loading && errors.length > 0 && (
           <p className="status-msg error">
-            Could not load events: {error}.{' '}
+            Could not load events.{' '}
             <button onClick={fetchEvents} className="retry-btn">Retry</button>
           </p>
         )}
-        {!loading && !error && (
+        {!loading && (
           <>
             <p className="results-bar">
-              Showing <strong>{filteredEvents.length}</strong> event
-              {filteredEvents.length !== 1 ? 's' : ''} in{' '}
+              <strong>{displayTotal}</strong> event{displayTotal !== 1 ? 's' : ''} in{' '}
               <strong>{activeCategory === 'All' ? 'all categories' : activeCategory}</strong>
               {' '}near Madison, WI
             </p>
-            <EventGrid events={filteredEvents} />
+            <EventGrid events={displayedEvents} />
+            <Pagination
+              page={currentPage}
+              totalPages={displayTotalPages}
+              total={displayTotal}
+              pageSize={PAGE_SIZE}
+              onPageChange={handlePageChange}
+            />
           </>
         )}
       </main>
       <footer className="footer-note">
-        Powered by Ticketmaster &bull; Dane County Events &bull; Free to use
+        Powered by Ticketmaster + Local Venues &bull; Dane County Events &bull; Free to use
       </footer>
     </div>
   );
