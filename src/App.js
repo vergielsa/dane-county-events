@@ -156,8 +156,8 @@ function App() {
             <p className="results-bar">
               <strong>{displayTotal}</strong> event{displayTotal !== 1 ? 's' : ''} in{' '}
               <strong>{activeCategory === 'All' ? 'all categories' : activeCategory}</strong>
-              {when !== 'All dates' && <> &middot; <strong>{when.toLowerCase()}</strong></>}
               {' '}near Madison, WI
+              {when !== 'All dates' && <> &middot; <strong>{when.toLowerCase()}</strong></>}
             </p>
             <EventGrid events={displayedEvents} />
             <Pagination
