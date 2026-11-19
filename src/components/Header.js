@@ -6,7 +6,7 @@ function Header({ onSubmitClick, onRequestVenue }) {
       <div className="app-logo">
         Dane County <span>Events</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div className="header-actions">
         <div className="header-meta">Madison, WI &bull; Free to use</div>
         <button className="submit-event-btn" onClick={onSubmitClick}>
           + Submit Event
