@@ -1,4 +1,5 @@
 import React from 'react';
+import { downloadIcs } from '../utils/calendar';
 
 const CATEGORY_CLASS = {
   Music:          'music',
@@ -52,6 +53,14 @@ function EventCard({ event }) {
           <span>🕐 {event.time}</span>
           {event.url && <span className="event-link-hint">↗ Visit site</span>}
         </div>
+        <button
+          type="button"
+          className="add-cal-btn"
+          onClick={(e) => { e.stopPropagation(); downloadIcs(event); }}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          + Add to calendar
+        </button>
         <div className="event-disclaimer">Dates, times, and prices may change. Confirm details with the venue before attending.</div>
       </div>
     </div>

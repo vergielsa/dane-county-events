@@ -148,6 +148,22 @@ body {
   color: #1a1814;
 }
 
+/* ── Add to calendar ── */
+.add-cal-btn {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid #ddd8cc;
+  color: #5a554a;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.add-cal-btn:hover { border-color: #c8a96e; color: #1a1814; }
+.when-row { padding-top: 0; }
+
 /* ── Category Pills ── */
 .cats {
   display: flex;

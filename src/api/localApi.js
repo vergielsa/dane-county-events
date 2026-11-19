@@ -1,10 +1,12 @@
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
 
-export async function fetchAllEvents({ page = 1, limit = 50, search = '', sort = 'date', category = 'All' } = {}) {
+export async function fetchAllEvents({ page = 1, limit = 50, search = '', sort = 'date', category = 'All', from = '', to = '' } = {}) {
   try {
     const params = new URLSearchParams({ page, limit, sort });
     if (search) params.set('search', search);
     if (category && category !== 'All') params.set('category', category);
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
 
     const res = await fetch(`${BACKEND_URL}/api/events/all?${params}`);
     if (!res.ok) throw new Error(`Backend error: ${res.status}`);
@@ -22,10 +24,12 @@ export async function fetchAllEvents({ page = 1, limit = 50, search = '', sort =
   }
 }
 
-export async function fetchLocalEvents({ page = 1, limit = 50, category = 'All', search = '', sort = 'date' } = {}) {
+export async function fetchLocalEvents({ page = 1, limit = 50, category = 'All', search = '', sort = 'date', from = '', to = '' } = {}) {
   try {
     const params = new URLSearchParams({ page, limit, sort });
     if (category && category !== 'All') params.set('category', category);
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
     if (search) params.set('search', search);
 
     const res = await fetch(`${BACKEND_URL}/api/events/submitted?${params}`);

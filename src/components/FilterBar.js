@@ -8,6 +8,9 @@ function FilterBar({
   onSearchChange,
   sortBy,
   onSortChange,
+  whenOptions = [],
+  when = 'All dates',
+  onWhenChange = () => {},
 }) {
   return (
     <>
@@ -43,6 +46,20 @@ function FilterBar({
           </button>
         ))}
       </div>
+
+      {whenOptions.length > 0 && (
+        <div className="cats when-row" aria-label="Filter by date">
+          {whenOptions.map(opt => (
+            <button
+              key={opt}
+              className={`cat-btn when-btn${when === opt ? ' active' : ''}`}
+              onClick={() => onWhenChange(opt)}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 }

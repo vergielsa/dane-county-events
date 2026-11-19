@@ -8,6 +8,7 @@ import DonateModal from './components/DonateModal';
 import SubmitEventModal, { SubmitSuccessModal } from './components/SubmitEventModal';
 import VenueRequestModal, { VenueRequestSuccessModal } from './components/VenueRequestModal';
 import { fetchAllEvents, fetchLocalEvents } from './api/localApi';
+import { WHEN_OPTIONS, getDateRange } from './utils/dateRanges';
 import './App.css';
 
 const CATEGORIES = ['All', 'Ticketmaster', 'Bars & Dives', 'Community'];
@@ -17,6 +18,7 @@ function App() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
+  const [when, setWhen] = useState('All dates');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showBanner, setShowBanner] = useState(true);
@@ -47,12 +49,13 @@ function App() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeCategory, sortBy]);
+  }, [activeCategory, sortBy, when]);
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     setErrors([]);
 
+    const range = getDateRange(when) || {};
     let result;
 
     // All and Ticketmaster both use /api/events/all (which includes TM events)
@@ -63,6 +66,8 @@ function App() {
         search: debouncedSearch,
         sort: sortBy,
         category: activeCategory,
+        from: range.from,
+        to: range.to,
       });
     } else {
       // Bars & Dives and Community use /api/events/submitted (local only)
@@ -72,6 +77,8 @@ function App() {
         category: activeCategory,
         search: debouncedSearch,
         sort: sortBy,
+        from: range.from,
+        to: range.to,
       });
     }
 
@@ -79,7 +86,7 @@ function App() {
     setDisplayTotal(result.total);
     setDisplayTotalPages(result.totalPages);
     setLoading(false);
-  }, [currentPage, activeCategory, debouncedSearch, sortBy]);
+  }, [currentPage, activeCategory, debouncedSearch, sortBy, when]);
 
   useEffect(() => {
     fetchEvents();
@@ -132,6 +139,9 @@ function App() {
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
         onSortChange={setSortBy}
+        whenOptions={WHEN_OPTIONS}
+        when={when}
+        onWhenChange={setWhen}
       />
       <main className="main">
         {loading && <p className="status-msg">Loading events...</p>}
@@ -146,6 +156,7 @@ function App() {
             <p className="results-bar">
               <strong>{displayTotal}</strong> event{displayTotal !== 1 ? 's' : ''} in{' '}
               <strong>{activeCategory === 'All' ? 'all categories' : activeCategory}</strong>
+              {when !== 'All dates' && <> &middot; <strong>{when.toLowerCase()}</strong></>}
               {' '}near Madison, WI
             </p>
             <EventGrid events={displayedEvents} />
